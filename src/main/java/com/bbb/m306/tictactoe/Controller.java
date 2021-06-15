@@ -24,30 +24,28 @@ public class Controller {
 
 		host_btn.setOnAction(e -> {
 			System.out.println("HOST");
-			host();
+			openWindow("hostScreen.fxml");
 		});
 
 		join_btn.setOnAction(e -> {
 			System.out.println("JOIN");
+			openWindow("gameScreen.fxml");
 		});
 
 	}
 
 
-	private void host() {
+	private void openWindow(String target) {
 
 		try {
 			FXMLLoader fxmlLoader = new FXMLLoader();
-			fxmlLoader.setLocation(getClass().getResource("hostScreen.fxml"));
-			/*
-			 * if "fx:controller" is not set in fxml
-			 * fxmlLoader.setController(NewWindowController);
-			 */
+			fxmlLoader.setLocation(getClass().getResource(target));
+
 			Scene scene = new Scene(fxmlLoader.load(), 600, 500);
 			scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
 
 			Stage stage = new Stage();
-			stage.setTitle("New Window");
+			stage.setTitle("TicTacToe");
 			stage.setScene(scene);
 
 			stage.show();
@@ -55,8 +53,6 @@ public class Controller {
 			e.printStackTrace();
 			System.out.println("Failed to create new Window.");
 		}
-
-
 
 	}
 

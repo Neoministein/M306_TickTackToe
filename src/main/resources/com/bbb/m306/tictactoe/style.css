@@ -4,3 +4,7 @@
     -fx-min-height: 70;
     -fx-text-fill: black;
 }
+.gameBtn {
+    -fx-min-width: 135;
+    -fx-min-height: 135;
+}
