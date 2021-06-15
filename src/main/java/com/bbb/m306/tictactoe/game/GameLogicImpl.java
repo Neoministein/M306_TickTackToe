@@ -19,7 +19,11 @@ public class GameLogicImpl implements GameLogic {
     }
 
     public void startGame() {
-        changes.firePropertyChange(GameLogic.NOTIFY_START,null, choseFirstPlayer());
+        changes.firePropertyChange(GameLogic.NOTIFY_START_HOST,null, choseFirstPlayer());
+    }
+
+    public void startGame(PlayerType playerType) {
+        changes.firePropertyChange(GameLogic.NOTIFY_START_REMOTE,null, playerType);
     }
 
     public boolean playMove(int i, PlayerType type) {
