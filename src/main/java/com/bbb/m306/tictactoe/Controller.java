@@ -44,9 +44,12 @@ public class Controller {
 			 * fxmlLoader.setController(NewWindowController);
 			 */
 			Scene scene = new Scene(fxmlLoader.load(), 600, 500);
+			scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+
 			Stage stage = new Stage();
 			stage.setTitle("New Window");
 			stage.setScene(scene);
+
 			stage.show();
 		} catch (IOException e) {
 			e.printStackTrace();
