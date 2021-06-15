@@ -17,7 +17,7 @@
             <Font size="20.0" />
          </font>
       </TextField>
-      <Button fx:id="join_btn" mnemonicParsing="false" text="JOIN" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+      <Button fx:id="join_btn" mnemonicParsing="false" styleClass="btn" text="JOIN" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
       <Button fx:id="host_btn" mnemonicParsing="false" styleClass="btn" text="HOST" GridPane.halignment="CENTER" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets top="20.0" />
