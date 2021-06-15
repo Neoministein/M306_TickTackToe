@@ -9,5 +9,5 @@ public interface GameRules {
 
     boolean isTurnValid(PlayerType[] playingField, int index, PlayerType actingPlayer);
 
-    boolean hasWon(PlayerType[] playingFiled);
+    boolean hasWon(PlayerType[] playingField);
 }
