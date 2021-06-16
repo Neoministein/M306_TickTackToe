@@ -66,11 +66,7 @@ public class LocalPlayer implements Player {
 
             case GameLogic.NOTIFY_END:
                 updateDisplay((int) propertyChangeEvent.getNewValue());
-                if (myTurn) {
-                    playerLB.setValue("You Won!");
-                } else {
-                    playerLB.setValue("You lose!");
-                }
+                updateWin();
                 break;
             default:
                 throw new UnsupportedOperationException(String.format("No implementation for property %s found!",
@@ -94,6 +90,18 @@ public class LocalPlayer implements Player {
 
     }
 
+    private void updateWin() {
+        Platform.runLater(() -> {
+            if (!myTurn) {
+                playerLB.setValue("You Won!");
+            } else {
+                playerLB.setValue("You lose!");
+            }
+            myTurn = false;
+        });
+
+    }
+
     private PlayerType getOtherPlayerType(PlayerType playerType) {
         if (PlayerType.X.equals(playerType)) {
             return PlayerType.O;
@@ -110,6 +118,8 @@ public class LocalPlayer implements Player {
     }
 
     public void buttonHasBeenPressed(int i) {
-        Singleton.getGameLogic().playMove(i, playerType, false);
+        if (myTurn) {
+            Singleton.getGameLogic().playMove(i, playerType, false);
+        }
     }
 }

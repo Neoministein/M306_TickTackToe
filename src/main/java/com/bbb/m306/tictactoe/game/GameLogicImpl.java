@@ -38,6 +38,7 @@ public class GameLogicImpl implements GameLogic {
         if (!gameRules.isTurnValid(playingField, i, type)) {
             return false;
         }
+        playingField[i] = type;
         if(gameRules.hasWon(playingField)) {
             changes.firePropertyChange(GameLogic.NOTIFY_END, actor, i);
             return true;
@@ -55,9 +56,9 @@ public class GameLogicImpl implements GameLogic {
     }
 
     private PlayerType choseFirstPlayer() {
-        //if (new Random().nextBoolean()) {
-        //  return PlayerType.X;
-        //}
+        if (new Random().nextBoolean()) {
+          return PlayerType.X;
+        }
         return PlayerType.O;
     }
 }
