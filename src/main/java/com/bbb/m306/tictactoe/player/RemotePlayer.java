@@ -1,10 +1,10 @@
 package com.bbb.m306.tictactoe.player;
 
 import java.beans.PropertyChangeEvent;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 import com.bbb.m306.tictactoe.PlayerType;
 import com.bbb.m306.tictactoe.game.GameLogic;
@@ -37,7 +37,7 @@ public class RemotePlayer implements Player, Runnable {
 				break;
 				
 			case GameLogic.NOTIFY_START_REMOTE:
-				SendToSocket(GameLogic.NOTIFY_START_REMOTE, propertyChangeEvent.getNewValue());
+				//SendToSocket(GameLogic.NOTIFY_START_REMOTE, propertyChangeEvent.getNewValue());
 				break;
 				
 			case GameLogic.NOTIFY_MOVE:
@@ -47,7 +47,7 @@ public class RemotePlayer implements Player, Runnable {
 				
 			case GameLogic.NOTIFY_END:
 				SendToSocket(GameLogic.NOTIFY_END, propertyChangeEvent.getNewValue());
-
+				break;
 			default:
 				throw new UnsupportedOperationException(String.format("No implementation for property %s found!", propertyChangeEvent.getPropertyName()));
 			}
@@ -56,20 +56,32 @@ public class RemotePlayer implements Player, Runnable {
 		}
 	}
 
+	@Override public void setGameLogic(GameLogic gameLogic) {
+		this.gameLogic = gameLogic;
+	}
+
 	public PlayerType getPlayerType() {
 		return type;
 	}
-	
+
+	@Override public void setPlayerType(PlayerType playerType) {
+		this.type = playerType;
+	}
+
 	private void SendToSocket(String message, Object arg) throws IOException {
-		DataOutputStream out = new DataOutputStream(this.socket.getOutputStream());
+		PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true);
+		//DataOutputStream out = new DataOutputStream(this.socket.getOutputStream());
 		
-		if(arg != null) {
-			out.writeUTF(String.format("%s:%s", message, arg));
+		if(arg != null)  {
+			String text = String.format("%s:%s", message, arg);
+			//out.writeUTF(text);
+			out.println(text);
 		} else {
-			out.writeUTF(message);
+			//out.writeUTF(message);
+			out.println(message);
 		}
-		
-		out.close();
+
+		out.flush();
 	}
 	
 	private void HandleIncomingMessage(String message) throws InterruptedException {
@@ -77,10 +89,10 @@ public class RemotePlayer implements Player, Runnable {
 		String[] messageParts = message.split(":");
 		switch (messageParts[0]) {
 			case GameLogic.NOTIFY_START_HOST:
-				gameLogic.startGame();
+				gameLogic.startGame(PlayerType.valueOf(messageParts[1]));
 				break;
 			case GameLogic.NOTIFY_START_REMOTE:
-				gameLogic.startGame(PlayerType.valueOf(messageParts[1]));
+				gameLogic.startGame();
 				break;
 				
 			case GameLogic.NOTIFY_MOVE:
@@ -103,21 +115,28 @@ public class RemotePlayer implements Player, Runnable {
 
 	@Override
 	public void run() {
-		DataInputStream in;
+		BufferedReader in;
 		try {
-			in = new DataInputStream(socket.getInputStream());
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			while(true) {
 				try {
-					String inMessage = in.readUTF();
-					
-					if(inMessage != null && isMyTurn) {
-						HandleIncomingMessage(inMessage);
-					}
-					
-					Thread.sleep(100);
-				} catch (IOException ioEx) {
+					//String inMessage = in.readUTF();
 					try {
-						in = new DataInputStream(socket.getInputStream());
+						String inMessage = in.readLine();
+						System.out.println("Message:" + inMessage);
+						if(inMessage != null) {
+							HandleIncomingMessage(inMessage);
+						}
+					}catch (SocketTimeoutException e) {
+
+					}
+					Thread.sleep(1000);
+				} catch (IOException ioEx) {
+					if (ioEx instanceof SocketException) {
+						socket = new Socket("127.0.0.1",5678);
+					}
+					try {
+						in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

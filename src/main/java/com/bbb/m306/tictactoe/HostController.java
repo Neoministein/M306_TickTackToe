@@ -3,6 +3,7 @@ package com.bbb.m306.tictactoe;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 public class HostController {
 
@@ -15,8 +16,9 @@ public class HostController {
 	public void initialize() {
 
 		// TODO: Get Own IP
-		ip_lbl.setText("192.168.1.1");
-		System.out.println("JADADAD");
+		ip_lbl.setText("127.0.0.1");
+
+		cancel_btn.setOnAction(e -> ((Stage)(((Button)e.getSource()).getScene().getWindow())).close());
 
 	}
 

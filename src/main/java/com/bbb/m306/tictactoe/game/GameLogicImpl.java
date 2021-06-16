@@ -4,6 +4,7 @@ import com.bbb.m306.tictactoe.PlayerType;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Arrays;
 import java.util.Random;
 
 public class GameLogicImpl implements GameLogic {
@@ -16,6 +17,8 @@ public class GameLogicImpl implements GameLogic {
     public GameLogicImpl(GameRules gameRules) {
         this.playingField = new PlayerType[GameRules.PLAYING_FIELD_SIZE];
         this.gameRules = gameRules;
+
+        Arrays.fill(playingField, PlayerType.EMPTY);
     }
 
     public void startGame() {
