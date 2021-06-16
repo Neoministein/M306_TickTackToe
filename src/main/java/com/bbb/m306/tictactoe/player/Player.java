@@ -9,6 +9,8 @@ public interface Player extends PropertyChangeListener {
 
     void setGameLogic(GameLogic gameLogic);
 
+    GameLogic getGameLogic();
+
     PlayerType getPlayerType();
 
     void setPlayerType(PlayerType playerType);

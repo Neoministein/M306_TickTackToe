@@ -15,7 +15,7 @@ public interface GameLogic {
 
     void startGame(PlayerType p);
 
-    boolean playMove(int i, PlayerType type);
+    boolean playMove(int i, PlayerType type, boolean isRemote);
 
     void addPlayer(PropertyChangeListener pcl);
 

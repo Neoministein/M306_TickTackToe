@@ -1,7 +1,9 @@
 package com.bbb.m306.tictactoe;
 
 import com.bbb.m306.tictactoe.game.GameLogic;
+import com.bbb.m306.tictactoe.player.LocalPlayer;
 import com.bbb.m306.tictactoe.player.Player;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -10,11 +12,9 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameController implements Player {
+public class GameController {
 
-	private GameLogic gameLogic;
-	private PlayerType playerType;
-	private boolean myTurn = false;
+	private LocalPlayer localPlayer;
 
 	private List<Button> buttonList;
 
@@ -31,9 +31,9 @@ public class GameController implements Player {
 	@FXML
 	private Label player_lbl;
 
+	public void init() {
+		player_lbl.textProperty().bind(localPlayer.getPlayerLB());
 
-	@FXML
-	public void initialize() {
 		buttonList = new ArrayList<>();
 		buttonList.add(btn0);
 		buttonList.add(btn1);
@@ -46,83 +46,24 @@ public class GameController implements Player {
 
 		for (Button button: buttonList) {
 			button.setOnAction(e -> buttonPress(((Button) e.getSource()).getId()));
+			button.textProperty().bind(localPlayer.getButtonProperty(getButtonId(button.getId())));
 		}
 
+	}
+
+	private int getButtonId(String buttonId) {
+		return Integer.valueOf(buttonId.substring(3));
 	}
 
 	private void buttonPress(String buttonId) {
-		if (myTurn) {
-			int id = Integer.valueOf(buttonId.substring(3));
-			gameLogic.playMove(id,playerType);
-		}
-
+		localPlayer.buttonHasBeenPressed(getButtonId(buttonId));
 	}
 
-	@Override
-	public PlayerType getPlayerType() {
-		return playerType;
+	public LocalPlayer getLocalPlayer() {
+		return localPlayer;
 	}
 
-	public void setPlayerType(PlayerType playerType) {
-		this.playerType = playerType;
-		player_lbl.setText("Player: " + playerType.toString());
-	}
-
-	public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-		try {
-			switch (propertyChangeEvent.getPropertyName()) {
-			case GameLogic.NOTIFY_START_HOST:
-			case GameLogic.NOTIFY_START_REMOTE:
-				PlayerType startType = (PlayerType) propertyChangeEvent.getNewValue();
-
-				if (playerType.equals(startType)) {
-					myTurn = true;
-				}
-				break;
-
-			case GameLogic.NOTIFY_MOVE:
-				updateDisplay((int) propertyChangeEvent.getNewValue());
-				break;
-
-			case GameLogic.NOTIFY_END:
-				updateDisplay((int) propertyChangeEvent.getNewValue());
-				if (myTurn) {
-					player_lbl.setText("You Won!");
-				} else {
-					player_lbl.setText("You lose!");
-				}
-				break;
-			default:
-				throw new UnsupportedOperationException(String.format("No implementation for property %s found!",
-						propertyChangeEvent.getPropertyName()));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void updateDisplay(int index) {
-		for (Button button: buttonList) {
-			if (("btn" + index).equals(button.getId())) {
-				if (myTurn) {
-					button.setText(playerType.toString());
-				} else {
-					button.setText(getOtherPlayerType(playerType).toString());
-				}
-				myTurn = false;
-				return;
-			}
-		}
-	}
-
-	private PlayerType getOtherPlayerType(PlayerType playerType) {
-		if (PlayerType.X.equals(playerType)) {
-			return PlayerType.O;
-		}
-		return PlayerType.X;
-	}
-
-	public void setGameLogic(GameLogic gameLogic) {
-		this.gameLogic = gameLogic;
+	public void setLocalPlayer(LocalPlayer localPlayer) {
+		this.localPlayer = localPlayer;
 	}
 }

@@ -4,6 +4,7 @@ import com.bbb.m306.tictactoe.game.GameLogic;
 import com.bbb.m306.tictactoe.game.GameLogicImpl;
 import com.bbb.m306.tictactoe.game.GameRules;
 import com.bbb.m306.tictactoe.game.GameRulesImpl;
+import com.bbb.m306.tictactoe.player.LocalPlayer;
 import com.bbb.m306.tictactoe.player.Player;
 import com.bbb.m306.tictactoe.player.RemotePlayer;
 import javafx.fxml.FXML;
@@ -27,10 +28,12 @@ public class Controller {
 	@FXML
 	private TextField ip_input;
 
+	private GameLogic gameLogic = Singleton.getGameLogic();
+
 
 	@FXML
 	public void initialize() {
-
+ 		//gameLogic = new GameLogicImpl(new GameRulesImpl());
 		host_btn.setOnAction(e -> host());
 
 		join_btn.setOnAction(e -> join());
@@ -38,17 +41,17 @@ public class Controller {
 	}
 
 	private void host() {
-		GameLogic gameLogic = new GameLogicImpl(new GameRulesImpl());
+		//GameLogic gameLogic = new GameLogicImpl(new GameRulesImpl());
 		try {
 			ServerSocket serverSocket = new ServerSocket(5678);
-			serverSocket.accept();
+			Socket socket = serverSocket.accept();
 			new Thread(new SocketThread(serverSocket),"SocketServer Thread").start();
-			Socket socket = new Socket("127.0.0.1",5678);
+			//Socket socket = new Socket("127.0.0.1",5678);
 			socket.setTcpNoDelay(true);
 			socket.setSoTimeout(200);
-			Player remotePlayer = new RemotePlayer(PlayerType.O,gameLogic,socket);
+			Player remotePlayer = new RemotePlayer(PlayerType.O,Singleton.getGameLogic(),socket);
 			Player localPlayer = createGameScene();
-			localPlayer.setGameLogic(gameLogic);
+			localPlayer.setGameLogic(Singleton.getGameLogic());
 			localPlayer.setPlayerType(PlayerType.X);
 			gameLogic.addPlayer(localPlayer);
 			gameLogic.addPlayer(remotePlayer);
@@ -59,7 +62,7 @@ public class Controller {
 	}
 
 	private void join() {
-		GameLogic gameLogic = new GameLogicImpl(new GameRulesImpl());
+		//GameLogic gameLogic = new GameLogicImpl(new GameRulesImpl());
 		try {
 			Socket socket = new Socket(ip_input.getText(),5678);
 			socket.setTcpNoDelay(true);
@@ -68,11 +71,12 @@ public class Controller {
 				throw new IOException();
 			}
 
-			Player remotePlayer = new RemotePlayer(PlayerType.X, gameLogic,socket);
+			Player remotePlayer = new RemotePlayer(PlayerType.X, Singleton.getGameLogic(),socket);
 			Player localPlayer = createGameScene();
+			remotePlayer.setGameLogic(Singleton.getGameLogic());
 			localPlayer.setPlayerType(PlayerType.O);
-			gameLogic.addPlayer(localPlayer);
-			gameLogic.addPlayer(remotePlayer);
+			Singleton.getGameLogic().addPlayer(localPlayer);
+			Singleton.getGameLogic().addPlayer(remotePlayer);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -80,7 +84,7 @@ public class Controller {
 	}
 
 	private Player createGameScene() {
-		Player player;
+		LocalPlayer player;
 		try {
 			FXMLLoader fxmlLoader = new FXMLLoader();
 			fxmlLoader.setLocation(getClass().getResource("gameScreen.fxml"));
@@ -92,7 +96,10 @@ public class Controller {
 			stage.setScene(scene);
 
 			stage.show();
-			player = fxmlLoader.getController();
+			player = new LocalPlayer();
+			GameController gameController = fxmlLoader.getController();
+			gameController.setLocalPlayer(player);
+			gameController.init();
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException();

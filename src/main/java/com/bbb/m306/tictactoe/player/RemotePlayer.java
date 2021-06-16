@@ -7,13 +7,14 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 import com.bbb.m306.tictactoe.PlayerType;
+import com.bbb.m306.tictactoe.Singleton;
 import com.bbb.m306.tictactoe.game.GameLogic;
 
 public class RemotePlayer implements Player, Runnable {
 
 	private boolean isMyTurn;
 	private PlayerType type;
-	private GameLogic gameLogic;
+	private volatile GameLogic gameLogic;
 	private Socket socket;
 	
 	private Thread cliThread;
@@ -21,7 +22,7 @@ public class RemotePlayer implements Player, Runnable {
 	public RemotePlayer(PlayerType type, GameLogic gameLogic, Socket socket) {
 		this.isMyTurn = false;
 		this.type = type;
-		this.gameLogic = gameLogic;
+		this.gameLogic = Singleton.getGameLogic();
 		
 		this.socket = socket;
 		
@@ -41,8 +42,10 @@ public class RemotePlayer implements Player, Runnable {
 				break;
 				
 			case GameLogic.NOTIFY_MOVE:
-				this.isMyTurn = !this.isMyTurn;
-				SendToSocket(GameLogic.NOTIFY_MOVE, propertyChangeEvent.getNewValue());
+				if (propertyChangeEvent.getOldValue().equals("LOCAL")) {
+					this.isMyTurn = !this.isMyTurn;
+					SendToSocket(GameLogic.NOTIFY_MOVE, propertyChangeEvent.getNewValue());
+				}
 				break;
 				
 			case GameLogic.NOTIFY_END:
@@ -56,7 +59,7 @@ public class RemotePlayer implements Player, Runnable {
 		}
 	}
 
-	@Override public void setGameLogic(GameLogic gameLogic) {
+	@Override public synchronized void setGameLogic(GameLogic gameLogic) {
 		this.gameLogic = gameLogic;
 	}
 
@@ -84,28 +87,28 @@ public class RemotePlayer implements Player, Runnable {
 		out.flush();
 	}
 	
-	private void HandleIncomingMessage(String message) throws InterruptedException {
+	private void handleIncomingMessage(String message) throws InterruptedException {
 
 		String[] messageParts = message.split(":");
 		switch (messageParts[0]) {
 			case GameLogic.NOTIFY_START_HOST:
-				gameLogic.startGame(PlayerType.valueOf(messageParts[1]));
+				Singleton.getGameLogic().startGame(PlayerType.valueOf(messageParts[1]));
 				break;
 			case GameLogic.NOTIFY_START_REMOTE:
-				gameLogic.startGame();
+				Singleton.getGameLogic().startGame();
 				break;
 				
 			case GameLogic.NOTIFY_MOVE:
 				this.isMyTurn = !this.isMyTurn;
-				gameLogic.playMove(Integer.getInteger(messageParts[1]), this.type);
+				Singleton.getGameLogic().playMove(Integer.valueOf(messageParts[1]), this.type, true);
 				break;
 				
 			case GameLogic.NOTIFY_END:
 				//Fucking die...
-				gameLogic.playMove(Integer.getInteger(messageParts[1]), this.type);
-				gameLogic.removePlayer(this);
+				Singleton.getGameLogic().playMove(Integer.valueOf(messageParts[1]), this.type, true);
+				Singleton.getGameLogic().removePlayer(this);
 				this.cliThread.join();
-				System.exit(0);
+				//System.exit(0);
 				break;
 	
 			default:
@@ -125,7 +128,7 @@ public class RemotePlayer implements Player, Runnable {
 						String inMessage = in.readLine();
 						System.out.println("Message:" + inMessage);
 						if(inMessage != null) {
-							HandleIncomingMessage(inMessage);
+							handleIncomingMessage(inMessage);
 						}
 					}catch (SocketTimeoutException e) {
 
@@ -149,4 +152,8 @@ public class RemotePlayer implements Player, Runnable {
 		}
 	}
 
+	@Override
+	public synchronized GameLogic getGameLogic() {
+		return gameLogic;
+	}
 }
