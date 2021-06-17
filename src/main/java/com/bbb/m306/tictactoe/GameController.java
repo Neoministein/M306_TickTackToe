@@ -43,6 +43,7 @@ public class GameController {
 		buttonList.add(btn5);
 		buttonList.add(btn6);
 		buttonList.add(btn7);
+		buttonList.add(btn8);
 
 		for (Button button: buttonList) {
 			button.setOnAction(e -> buttonPress(((Button) e.getSource()).getId()));
