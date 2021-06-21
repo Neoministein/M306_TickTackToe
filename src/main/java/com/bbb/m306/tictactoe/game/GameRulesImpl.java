@@ -82,17 +82,23 @@ public class GameRulesImpl implements GameRules {
     
     private boolean checkWinBottomLeftTopRight(PlayerType[] playingField) {
         boolean hasWon = true;
-        int index = GameRules.PLAYING_FIELD_WIDTH * (GameRules.PLAYING_FIELD_HEIGHT - 1);
+        int index = GameRules.PLAYING_FIELD_WIDTH * (GameRules.PLAYING_FIELD_HEIGHT -1);
         PlayerType type = playingField[index];
+
         if (!type.equals(PlayerType.EMPTY)) {
+            if(playingField[4].equals(type) && playingField[2].equals(type)) {
+                return hasWon;
+            }
+            /*
             for (int x = 0; x < GameRules.PLAYING_FIELD_HEIGHT - 1; x++) {
                 index = GameRules.PLAYING_FIELD_WIDTH * (GameRules.PLAYING_FIELD_HEIGHT - 1 - x);
                 if (!playingField[index + x].equals(type)) {
                     hasWon = false;
                 }
             }
-            return hasWon;
+            return hasWon;*/
         }
+
         return false;
     }
 }
