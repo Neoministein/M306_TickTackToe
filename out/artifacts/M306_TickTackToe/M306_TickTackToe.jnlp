@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="M306_TickTackToe.jnlp">
   <information>
-    <title>M306_TickTackToe</title>
+    <title>TicTacToe</title>
     <vendor>Unknown</vendor>
     <description>M306_TickTackToe</description>
     <offline-allowed/>
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="M306_TickTackToe.jar" size="21839" download="eager" />
+    <jar href="M306_TickTackToe.jar" size="22123" download="eager" />
   </resources>
   <jfx:javafx-desc  width="600" height="500" main-class="com.bbb.m306.tictactoe.Main"  name="M306_TickTackToe" />
   <update check="background"/>
