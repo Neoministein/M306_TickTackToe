@@ -16,7 +16,7 @@ public class LocalPlayer implements Player {
     private PlayerType playerType;
     private boolean myTurn;
 
-
+    private StringProperty startingPlayer = new SimpleStringProperty();
     private StringProperty playerLB = new SimpleStringProperty();
     private Map<Integer, StringProperty> buttonTextMap = new HashMap<>();
 
@@ -53,6 +53,7 @@ public class LocalPlayer implements Player {
             switch (propertyChangeEvent.getPropertyName()) {
             case GameLogic.NOTIFY_START_HOST:
             case GameLogic.NOTIFY_START_REMOTE:
+                setStartingPlayer((PlayerType) propertyChangeEvent.getNewValue());
                 PlayerType startType = (PlayerType) propertyChangeEvent.getNewValue();
 
                 if (playerType.equals(startType)) {
@@ -102,6 +103,16 @@ public class LocalPlayer implements Player {
 
     }
 
+    private void setStartingPlayer(PlayerType startType) {
+        if (playerType.equals(startType)) {
+            myTurn = true;
+        }
+
+        Platform.runLater(() -> {
+            startingPlayer.setValue("Player " + startType.toString() + " starts");
+        });
+    }
+
     private PlayerType getOtherPlayerType(PlayerType playerType) {
         if (PlayerType.X.equals(playerType)) {
             return PlayerType.O;
@@ -115,6 +126,10 @@ public class LocalPlayer implements Player {
 
     public StringProperty getButtonProperty(int index) {
         return buttonTextMap.get(index);
+    }
+
+    public StringProperty getStartingPlayer() {
+        return startingPlayer;
     }
 
     public void buttonHasBeenPressed(int i) {

@@ -18,6 +18,7 @@ public class GameController {
 
 	private List<Button> buttonList;
 
+	public Label startingPlayer;
 	public Button btn0;
 	public Button btn1;
 	public Button btn2;
@@ -33,6 +34,7 @@ public class GameController {
 
 	public void init() {
 		player_lbl.textProperty().bind(localPlayer.getPlayerLB());
+		startingPlayer.textProperty().bind(localPlayer.getStartingPlayer());
 
 		buttonList = new ArrayList<>();
 		buttonList.add(btn0);
