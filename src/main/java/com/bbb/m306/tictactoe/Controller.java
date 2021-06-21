@@ -107,25 +107,5 @@ public class Controller {
 		return player;
 	}
 
-	private void openWindow(String target) {
-
-		try {
-			FXMLLoader fxmlLoader = new FXMLLoader();
-			fxmlLoader.setLocation(getClass().getResource(target));
-
-			Scene scene = new Scene(fxmlLoader.load(), 600, 500);
-			scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
-
-			Stage stage = new Stage();
-			stage.setTitle("TicTacToe");
-			stage.setScene(scene);
-
-			stage.show();
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("Failed to create new Window.");
-		}
-	}
-
 
 }
